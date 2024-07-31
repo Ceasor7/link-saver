@@ -1,12 +1,11 @@
-import RegisterForm from "@/components/RegisterForm";
-import React from "react";
+import RegisterForm from '@/components/RegisterForm';
 
 type Props = {};
 
 const page = (props: Props) => {
   return (
     <div className="w-full">
-      <section className="h-screen flex items-center justify-center">
+      <section className="h-screen pt-10 flex items-center justify-center">
         <RegisterForm />
       </section>
     </div>

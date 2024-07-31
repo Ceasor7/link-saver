@@ -1,40 +1,65 @@
-"use client";
+'use client';
 
-import CardWrapper from "./card-wrapper";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { RegisterSchema } from "@/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+} from '@/components/ui/form';
+import { RegisterSchema } from '@/schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import CardWrapper from './card-wrapper';
 
-import { z } from "zod";
-import { useFormStatus } from "react-dom";
-import { useState } from "react";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useFormStatus } from 'react-dom';
+import { z } from 'zod';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+
+type RegisterFormData = z.infer<typeof RegisterSchema>;
 
 const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
-  const form = useForm({
+  const [error, setError] = useState('');
+  const router = useRouter();
+  const form = useForm<RegisterFormData>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      email: "",
-      name: "",
-      password: "",
-      confirmPassword: "",
+      email: '',
+      password: '',
     },
   });
 
-  const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
+  const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
-    console.log(data);
+    setError('');
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (res.status === 400) {
+        setError('This email is already registered');
+      } else if (res.status === 200) {
+        router.push('/');
+      } else {
+        setError('Error, try again');
+      }
+    } catch (error) {
+      setError('Error, try again');
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const { pending } = useFormStatus();
@@ -67,19 +92,6 @@ const RegisterForm = () => {
             />
             <FormField
               control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="John Doe" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
@@ -91,22 +103,14 @@ const RegisterForm = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="password" placeholder="******" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
-          <Button type="submit" className="w-full" disabled={pending}>
-            {loading ? "Loading..." : "Register"}
+          {error && <p className="text-red-500">{error}</p>}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={pending || loading}
+          >
+            {loading ? 'Loading...' : 'Register'}
           </Button>
         </form>
       </Form>

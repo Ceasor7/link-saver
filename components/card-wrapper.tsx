@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
 import {
   Card,
   CardContent,
-  CardHeader,
   CardFooter,
-} from "@/components/ui/card";
-import AuthHeader from "./auth-header";
-import BackButton from "./back-button";
+  CardHeader,
+} from '@/components/ui/card';
+import AuthHeader from './auth-header';
+import BackButton from './back-button';
 
 interface CardWrapperProps {
   label: string;
@@ -29,7 +29,9 @@ const CardWrapper = ({
       <CardHeader>
         <AuthHeader label={label} title={title} />
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className=" text-black dark:text-white">
+        {children}
+      </CardContent>
       <CardFooter>
         <BackButton label={backButtonLabel} href={backButtonHref} />
       </CardFooter>

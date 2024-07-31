@@ -1,5 +1,4 @@
-import AddLink from "@/components/AddLink";
-import React from "react";
+import AddLink from '@/components/AddLink';
 
 type Props = {};
 
